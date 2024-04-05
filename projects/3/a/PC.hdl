@@ -10,9 +10,20 @@
  * else              out(t+1) = out(t)
  */
 CHIP PC {
-    IN in[16],inc, load, reset;
+    IN in[16], inc, load, reset;
     OUT out[16];
     
     PARTS:
-    //// Replace this comment with your code.
+
+	// increment the program counter
+	Inc16(in = feedback, out = pc);
+
+	// select what should be the input to the register
+	// reset has the highest priority so it is last
+    Mux16(a = feedback, b = pc, sel = inc, out = w0);
+	Mux16(a = w0, b = in, sel = load, out = w1);
+	Mux16(a = w1, b = false, sel = reset, out = w2);
+
+	// set the register
+	Register(in = w2, load = true, out = out, out = feedback);
 }
