@@ -25,5 +25,13 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-	//// Replace this comment with your code.
+	DMux(in=load, sel=address[14], a=loadRAM, b=preLoadScreen);				
+	Mux(a=preLoadScreen, b=false, sel=address[13], out=loadScreen);			// if load is true and we have to access keyboard (which shouldn't happen but this is a falsafe)
+
+	RAM16K(in=in, load=loadRAM, address=address[0..13], out=outRAM);
+	Screen(in=in, load=loadScreen, address=address[0..12], out=outScreen);
+	Keyboard(out=outKbd);
+
+	Mux16(a=outScreen, b=outKbd, sel=address[13], out=out1);	
+	Mux16(a=outRAM, b=out1, sel=address[14], out=out);
 }
