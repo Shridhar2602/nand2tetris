@@ -1,4 +1,4 @@
-#include "parser.cpp"
+#include "assemblerParser.cpp"
 #include "code.cpp"	
 #include <bitset>
 using namespace std;
@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 	// First Pass
 	{
 		int lineNum = 0;
-		Parser parser = Parser(argv[1]);
+		AssemblerParser parser = AssemblerParser(argv[1]);
 		while(parser.has_more_lines()) {
 			parser.advance();
 			int type = parser.instruction_type();
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	Parser parser = Parser(argv[1]);
+	AssemblerParser parser = AssemblerParser(argv[1]);
 	string instruction {};
 	int symbol;
 	while(parser.has_more_lines()) {

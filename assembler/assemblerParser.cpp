@@ -1,7 +1,4 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-using namespace std;
+#include "../lib/parser.cpp"
 
 enum instruction 
 {
@@ -10,20 +7,12 @@ enum instruction
 	L_instruction,
 };
 
-class Parser 
+class AssemblerParser : public Parser
 {
 public:
-	Parser(string inputFile) 
+	AssemblerParser(string inputFile) : Parser(inputFile)
 	{
-		init(inputFile);
-	}
 
-	bool has_more_lines() 
-	{
-		char peekedChar = inf.peek();
-		if(peekedChar == EOF)
-			return false;
-		return true;
 	}
 
 	void advance() 
@@ -33,7 +22,7 @@ public:
 			return; 
 		}
 
-		curr_inst = get_next_instruction();
+		curr_inst = get_next_line();
 		// cout << "Instruction: " << curr_inst << "\n";
 
 		parse_instruction_type();
@@ -86,14 +75,7 @@ public:
 		return m_jump;
 	}
 
-	void close() 
-	{
-		inf.close();
-	}
-
 private:
-	ifstream inf;
-	string parsed {};
 	string curr_inst {};
 	string m_comp {};
 	string m_dest {};
@@ -101,18 +83,6 @@ private:
 	string m_symbol {};
 	int inst_type = -1;
 	
-	int init(string inputPath) 
-	{
-		inf.open(inputPath, std::ios::in);
-
-		if(!inf) {
-			cerr << "Input .asm could not be opened!\n";
-			return 1;
-		}
-
-		return 0;
-	}
-
 	void parse_instruction_type() 
 	{
 		if(curr_inst[0] == '@')
@@ -121,30 +91,6 @@ private:
 			inst_type = L_instruction;
 		else
 			inst_type = C_instruction;
-	}
-
-	string get_next_instruction() 
-	{
-		while(getline(inf, parsed)) 
-		{
-			// to deal with empty lines and LF/CRLF 
-			if(parsed.empty() || (parsed.size() == 1 && parsed[0] == '\r'))
-				continue;
-
-			remove_leading_spaces(parsed);
-			remove_eol(parsed);
-
-			int comment_pos = parsed.find("//", 0);
-			if(comment_pos == 0)
-				continue;
-
-			parsed = parsed.substr(0, comment_pos);
-			remove_trailing_spaces(parsed);
-			break;
-		}
-
-
-		return parsed;
 	}
 
 	void parse_AL_instruction() 
@@ -219,31 +165,5 @@ private:
 		}
 		else 
 			m_jump = "null";
-	}
-
-	void remove_leading_spaces(string& s) 
-	{
-		int i = 0;
-		int n = s.size();
-		while(i < n && (s[i] == ' ' || s[i] == '\t'))
-			i++;
-		s = s.substr(i, n - i);
-	}
-
-	void remove_trailing_spaces(string& s)
-	{
-		int i = s.size() - 1;
-		while(i >=0 && (s[i] == ' ' || s[i] == '\t'))
-			i--;
-
-		s = s.substr(0, i + 1);
-	}
-
-	void remove_eol(string& s) 
-	{
-		if(s.back() == '\n')
-			s.pop_back();
-		if(s.back() == '\r')
-			s.pop_back();
 	}
 };
