@@ -22,7 +22,7 @@ M = D
 D = M
 @R15
 A = M
-M = M + D
+M = D
 @21
 D = A
 @SP
@@ -54,7 +54,7 @@ M = D
 D = M
 @R15
 A = M
-M = M + D
+M = D
 @SP
 M = M - 1
 @SP
@@ -72,7 +72,7 @@ M = D
 D = M
 @R15
 A = M
-M = M + D
+M = D
 @36
 D = A
 @SP
@@ -97,7 +97,7 @@ M = D
 D = M
 @R15
 A = M
-M = M + D
+M = D
 @42
 D = A
 @SP
@@ -129,7 +129,7 @@ M = D
 D = M
 @R15
 A = M
-M = M + D
+M = D
 @SP
 M = M - 1
 @SP
@@ -147,7 +147,7 @@ M = D
 D = M
 @R15
 A = M
-M = M + D
+M = D
 @510
 D = A
 @SP

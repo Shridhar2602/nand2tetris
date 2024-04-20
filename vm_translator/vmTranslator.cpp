@@ -1,7 +1,21 @@
 #include "vmParser.cpp"
 #include "codeWriter.cpp"
+#include <sys/stat.h>
+#include <filesystem>
+#include <vector>
+namespace fs = std::filesystem;
 
-string get_file_name(string path);
+struct file {
+	string path;
+	string name;
+
+	file(string p, string n) {
+		path = p;
+		name = n;
+	}
+};
+
+string get_files(string path, vector<file>& fileList);
 
 int main(int argc, char* argv[]) 
 {
@@ -10,41 +24,105 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	string filename = get_file_name(argv[1]);
+	string path = argv[1];
+	string outputPath {};
+	vector<file> fileList;
 
-	VMParser parser = VMParser(argv[1]);
-	CodeWriter codeWriter = CodeWriter(filename);
+	outputPath = get_files(path, fileList);
 
-	int command_type = -1;
-	while(parser.has_more_lines()) 
+	CodeWriter codeWriter = CodeWriter(outputPath);
+
+	for(auto file : fileList) 
 	{
-		parser.advance();
-		command_type = parser.command_type();
+		try {
+			VMParser parser = VMParser(file.path);
 
-		if(command_type == C_ARITHMETIC) {
-			codeWriter.write_arithmetic(parser.arg1());
-		}
-		else if(command_type == C_PUSH){
-			codeWriter.write_push(parser.arg1(), parser.arg2());
-		}
-		else if(command_type == C_POP){
-			codeWriter.write_pop(parser.arg1(), parser.arg2());
+			codeWriter.set_fileName(file.name);
+			int command_type = -1;
+			while(parser.has_more_lines()) 
+			{
+				parser.advance();
+				command_type = parser.command_type();
+
+				if(command_type == C_ARITHMETIC) {
+					codeWriter.write_arithmetic(parser.arg1());
+				}
+				else if(command_type == C_PUSH){
+					codeWriter.write_push(parser.arg1(), parser.arg2());
+				}
+				else if(command_type == C_POP){
+					codeWriter.write_pop(parser.arg1(), parser.arg2());
+				}
+				else if(command_type == C_LABEL) {
+					codeWriter.write_label(parser.arg1());
+				}
+				else if(command_type == C_GOTO) {
+					codeWriter.write_goto(parser.arg1());
+				}
+				else if(command_type == C_IF) {
+					codeWriter.write_if_goto(parser.arg1());
+				}
+				else if(command_type == C_FUNCTION) {
+					codeWriter.write_function(parser.arg1(), parser.arg2());
+				}
+				else if(command_type == C_CALL) {
+					codeWriter.write_call(parser.arg1(), parser.arg2());
+				}
+				else if(command_type == C_RETURN) {
+					codeWriter.write_return();
+				}
+			}
+
+			codeWriter.write_end_loop();	
+			parser.close();
+		} 
+		
+		catch(const exception& exception) {
+			codeWriter.close();
+			cout << "Something went wrong\n";
 		}
 	}
 
-	codeWriter.write_end_loop();
-	parser.close();
 	codeWriter.close();
 	return 0;
 }
 
-string get_file_name(string path) 
-{
-	int dot_pos = path.find_last_of(".");
-	if(path.substr(dot_pos) != ".vm") {
-		cerr << "Input file must be a .vm file\n";
+string get_files(string path, vector<file>& fileList) {
+
+	string outputPath {};
+	string fileName {};
+	struct stat s;
+	if(stat(path.c_str(), &s) != -1) {
+		if(S_ISDIR(s.st_mode)) {
+			// a directory
+			if(path.substr(path.size() - 1) != "/")
+				path = path + "/";	
+			fileName = path.substr(0, path.size() - 1);
+			fileName = fileName.substr(fileName.find_last_of("/") + 1);
+			outputPath = path + fileName;
+			for (const auto & entry : fs::directory_iterator(path)) {
+        		string curFile = entry.path();
+
+				if(curFile.size() > 3 && curFile.substr(curFile.size() - 3) == ".vm") {
+					string curPath = curFile.substr(0, curFile.size() - 3);
+					fileName = curPath.substr(curPath.find_last_of("/") + 1);
+					fileList.push_back(file (curFile, fileName));
+				}
+			}
+		}
+		else {
+			// a file
+			if(path.size() > 3 && path.substr(path.size() - 3) == ".vm") {
+				outputPath = path.substr(0, path.size() - 3);
+				fileName = outputPath.substr(outputPath.find_last_of("/") + 1);
+				fileList.push_back(file (path, fileName));
+			}
+		}
+
+		return outputPath;
+	}
+	else {
+		cout << "Invalid file/folder\n";
 		exit(-1);
 	}
-
-	return path.substr(0, dot_pos);
 }
