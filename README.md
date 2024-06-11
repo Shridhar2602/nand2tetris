@@ -72,23 +72,11 @@ The interim VM code is based on stack-based automata that can be fairly easily t
 
 ## Project 9 & 10: Compiler I & II
 
-I began the construction of a Jack compiler, which translates Jack programs into VM code. This first part of the compiler handles the lexical analysis and syntax analysis phases, generating intermediate representations of the code.
-
-## Project 11: Compiler II
-
-In this project, I completed the Jack compiler by implementing code generation. The compiler translates the intermediate representations into VM code that can be executed by the Hack virtual machine.
+The constructor of compiler is divided into 2 parts: tokenizing and code generation. Refer to [Compiler Notes](./compiler/README.md).
 
 ## Project 12: Operating System
 
-The final project involves building a basic operating system for the Hack computer. This operating system includes essential services like memory management, input/output handling, and process management. The culmination of this project is a fully functional computer system capable of running complex applications like a Tetris game.
-
-## Conclusion
-
-Completing the Nand2Tetris project has provided me with a deep understanding of computer systems from the ground up. Each project builds upon the previous ones, offering a comprehensive and practical insight into the inner workings of modern computing. I hope this repository serves as a useful resource for anyone interested in computer architecture and low-level software development.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+The final project involves building a basic operating system for the Hack computer. This operating system includes essential services like memory management, input/output handling, and process management. With an OS, Hack is now a fully functional computer system capable of running complex applications like a Tetris game.
 
 ## Acknowledgments
 
