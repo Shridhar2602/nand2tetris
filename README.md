@@ -74,7 +74,7 @@ The interim VM code is based on stack-based automata that can be fairly easily t
 
 The constructor of compiler is divided into 2 parts: tokenizing and code generation. Refer to [Compiler Notes](./compiler/README.md).
 
-## Project 12: Operating System
+## Project 11: Operating System
 
 The final project involves building a basic operating system for the Hack computer. This operating system includes essential services like memory management, input/output handling, and process management. With an OS, Hack is now a fully functional computer system capable of running complex applications like a Tetris game.
 
